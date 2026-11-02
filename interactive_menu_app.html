@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uide Fast Food | Интерактивное Меню</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            gold: '#ff9f1c',
+                            yellow: '#ffbf00',
+                            dark: '#121212',
+                            card: '#1e1e1e',
+                            gray: '#2a2a2a'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0f0f0f;
+            color: #f3f4f6;
+            font-family: 'Montserrat', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .glass-header {
+            background: rgba(18, 18, 18, 0.90);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="pb-28">
+
+    <!-- Header Section -->
+    <header class="sticky top-0 z-30 glass-header border-b border-zinc-800 transition-all duration-300">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+            
+            <!-- Logo & Brand -->
+            <div class="flex items-center space-x-3">
+                <div class="w-11 h-11 bg-gradient-to-tr from-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center font-bold text-black text-xl shadow-lg shadow-orange-500/20 shrink-0">
+                    <i class="fa-solid fa-fire text-black text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-xl tracking-wide bg-gradient-to-r from-amber-400 via-orange-400 to-amber-200 bg-clip-text text-transparent">
+                        Uide <span class="text-xs uppercase px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 ml-1">Fast Food</span>
+                    </h1>
+                    <p class="text-[11px] text-zinc-400 flex items-center gap-1.5 mt-0.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                        <span id="txt-delivery-badge">🚚 Доставка имеется</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Language Switcher & Contact Button -->
+            <div class="flex items-center gap-2">
+                <!-- Lang Switcher -->
+                <div class="bg-zinc-800/90 border border-zinc-700 p-1 rounded-xl flex items-center">
+                    <button id="lang-ru" onclick="switchLanguage('ru')" class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all bg-amber-500 text-black">RU</button>
+                    <button id="lang-kk" onclick="switchLanguage('kk')" class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all text-zinc-400 hover:text-white">KK</button>
+                </div>
+
+                <!-- Call/WhatsApp Btn -->
+                <a href="https://wa.me/77002302331" target="_blank" class="hidden sm:flex items-center gap-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-semibold px-3 py-2 rounded-xl border border-emerald-500/30 transition">
+                    <i class="fa-brands fa-whatsapp text-sm"></i>
+                    <span>+7 700 230 23 31</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Info Ribbon (Address & Mobile Phone) -->
+        <div class="bg-zinc-900/80 border-t border-zinc-800/80 px-4 py-1.5 text-xs text-zinc-400">
+            <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5">
+                    <i class="fa-solid fa-location-dot text-amber-400"></i>
+                    <span id="txt-address">село Караул, ул. Ералы 22б</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="tel:+77002302331" class="hover:text-amber-400 flex items-center gap-1">
+                        <i class="fa-solid fa-phone text-amber-400"></i>
+                        <span>+7 700 230 23 31</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="max-w-6xl mx-auto px-4 pt-2 pb-2">
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 text-sm"></i>
+                <input type="text" id="searchInput" placeholder="Поиск блюд..." 
+                    class="w-full bg-zinc-900 text-zinc-100 placeholder-zinc-500 pl-10 pr-10 py-2.5 rounded-xl border border-zinc-800 focus:outline-none focus:border-amber-500 text-sm transition-all duration-200">
+                <button id="clearSearch" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-200">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Scrollable Category Tabs -->
+        <div class="max-w-6xl mx-auto px-4 pb-3">
+            <div id="categoryTabs" class="flex space-x-2 overflow-x-auto no-scrollbar py-1 text-sm font-medium">
+                <!-- Categories rendered dynamically -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 mt-5">
+
+        <!-- Banner Promo -->
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 border border-amber-500/20 p-5 mb-8 shadow-2xl">
+            <div class="absolute -right-6 -bottom-6 w-36 h-36 bg-amber-500/10 rounded-full blur-2xl"></div>
+            <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <span class="bg-amber-500/10 text-amber-400 text-xs font-semibold px-2.5 py-1 rounded-full border border-amber-500/20 mb-2 inline-block" id="txt-promo-badge">
+                        ✨ Вкусная еда с доставкой
+                    </span>
+                    <h2 class="text-xl sm:text-2xl font-bold text-white" id="txt-banner-title">Свежие донеры, бургеры и пицца</h2>
+                    <p class="text-xs sm:text-sm text-zinc-400 mt-1" id="txt-banner-desc">Оформите заказ в один клик и мы отправим его прямо в WhatsApp</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products List -->
+        <div id="menuContainer" class="space-y-10"></div>
+
+        <!-- Empty State -->
+        <div id="emptySearch" class="hidden text-center py-16">
+            <i class="fa-solid fa-utensils text-4xl text-zinc-600 mb-3"></i>
+            <h3 class="text-lg font-bold text-zinc-300" id="txt-empty-title">Ничего не найдено</h3>
+            <p class="text-xs text-zinc-500 mt-1" id="txt-empty-desc">Попробуйте изменить поисковый запрос</p>
+        </div>
+    </main>
+
+    <!-- Floating Cart Button -->
+    <div id="floatingCartBtn" class="fixed bottom-5 left-1/2 -translate-x-1/2 w-[92%] max-w-md z-40 hidden">
+        <button onclick="toggleCartModal(true)" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold py-3.5 px-5 rounded-2xl shadow-xl shadow-orange-500/20 flex items-center justify-between transition transform active:scale-95">
+            <div class="flex items-center gap-3">
+                <span id="cartBadge" class="bg-black text-amber-400 font-extrabold text-xs w-7 h-7 rounded-full flex items-center justify-center border border-amber-400/30">0</span>
+                <span class="text-sm font-extrabold uppercase tracking-wider" id="txt-cart-btn">Корзина</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span id="cartTotalPrice" class="text-base font-extrabold">0 тг</span>
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+            </div>
+        </button>
+    </div>
+
+    <!-- Cart Modal Drawer -->
+    <div id="cartModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden transition-opacity duration-300">
+        <div class="fixed inset-y-0 right-0 max-w-lg w-full bg-zinc-900 border-l border-zinc-800 shadow-2xl flex flex-col justify-between">
+            
+            <!-- Cart Header -->
+            <div class="p-4 border-b border-zinc-800 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-bag-shopping text-amber-400 text-lg"></i>
+                    <h3 class="font-bold text-lg text-white" id="txt-cart-title">Ваш заказ</h3>
+                </div>
+                <button onclick="toggleCartModal(false)" class="text-zinc-400 hover:text-white w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Cart Items List -->
+            <div id="cartItemsList" class="p-4 overflow-y-auto flex-1 space-y-3"></div>
+
+            <!-- Checkout Form & Footer -->
+            <div id="cartFooter" class="p-4 border-t border-zinc-800 bg-zinc-950/80 space-y-4">
+                
+                <div class="space-y-2">
+                    <label class="text-xs font-semibold text-zinc-400 block" id="txt-details-label">Детали доставки</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="customerName" placeholder="Ваше имя" 
+                            class="bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-500">
+                        <input type="text" id="customerAddress" placeholder="Адрес или № стола" 
+                            class="bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-500">
+                    </div>
+                    <textarea id="customerNote" rows="2" placeholder="Комментарий к заказу" 
+                        class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-500 resize-none"></textarea>
+                </div>
+
+                <div class="flex justify-between items-center py-2 border-t border-zinc-800">
+                    <span class="text-sm text-zinc-400" id="txt-total-label">Итого к оплате:</span>
+                    <span id="cartModalTotal" class="text-xl font-extrabold text-amber-400">0 тг</span>
+                </div>
+
+                <button onclick="sendOrderWhatsApp()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold py-3.5 rounded-xl shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 transition active:scale-95">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                    <span id="txt-submit-btn">Заказать через WhatsApp</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed top-5 right-5 z-50 bg-amber-500 text-black font-bold text-xs px-4 py-3 rounded-xl shadow-2xl transition duration-300 transform translate-y-[-100px] opacity-0 flex items-center gap-2">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toastMsg">Добавлено</span>
+    </div>
+
+    <script>
+        const PHONE_NUMBER = "77002302331";
+        let currentLang = 'ru';
+
+        // Translation dictionary for UI elements
+        const i18n = {
+            ru: {
+                searchPlaceholder: "Поиск блюд...",
+                deliveryBadge: "🚚 Доставка имеется",
+                address: "село Караул, ул. Ералы 22б",
+                promoBadge: "✨ Вкусная еда с доставкой",
+                bannerTitle: "Свежие донеры, бургеры и пицца",
+                bannerDesc: "Оформите заказ в один клик и мы отправим его прямо в WhatsApp",
+                emptyTitle: "Ничего не найдено",
+                emptyDesc: "Попробуйте изменить поисковый запрос",
+                cartBtn: "Корзина",
+                cartTitle: "Ваш заказ",
+                detailsLabel: "Детали доставки / заказа",
+                namePlaceholder: "Ваше имя",
+                addrPlaceholder: "Адрес или № стола",
+                notePlaceholder: "Комментарий к заказу (соусы, аллергия и т.д.)",
+                totalLabel: "Итого к оплате:",
+                submitBtn: "Заказать через WhatsApp",
+                variantSelect: "Выберите вариант:",
+                priceLabel: "Цена",
+                addBtn: "В корзину",
+                cartEmpty: "Корзина пуста",
+                addedToast: "Добавлено в корзину: ",
+                standard: "Стандарт",
+                mini: "Мини"
+            },
+            kk: {
+                searchPlaceholder: "Тағамдарды издеу...",
+                deliveryBadge: "🚚 Жеткізу бар",
+                address: "Қарауыл ауылы, Ералы көшесі 22б",
+                promoBadge: "✨ Дәмді тағамдар мен жеткізу",
+                bannerTitle: "Жас донерлер, бургерлер мен пицца",
+                bannerDesc: "Тапсырысты бір басу арқылы тікелей WhatsApp-қа жіберіңіз",
+                emptyTitle: "Ештеңе табылмады",
+                emptyDesc: "Іздеу сұрауын өзгертіп көріңіз",
+                cartBtn: "Себет",
+                cartTitle: "Сіздің тапсырысыңыз",
+                detailsLabel: "Жеткізу деректері",
+                namePlaceholder: "Атыңыз",
+                addrPlaceholder: "Мекенжай немесе үстел №",
+                notePlaceholder: "Тапсырысқа пікір (тұздықтар, аллергия т.б.)",
+                totalLabel: "Барлығы төлеуге:",
+                submitBtn: "WhatsApp арқылы тапсырыс беру",
+                variantSelect: "Нұсқаны таңдаңыз:",
+                priceLabel: "Бағасы",
+                addBtn: "Себетке",
+                cartEmpty: "Себет бос",
+                addedToast: "Себетке қосылды: ",
+                standard: "Стандарт",
+                mini: "Мини"
+            }
+        };
+
+        const categories = [
+            { id: 'all', icon: 'fa-utensils', ru: 'Все', kk: 'Барлығы' },
+            { id: 'doner', icon: 'fa-scroll', ru: 'Донер', kk: 'Донер' },
+            { id: 'burger', icon: 'fa-hamburger', ru: 'Бургер', kk: 'Бургер' },
+            { id: 'pizza', icon: 'fa-pizza-slice', ru: 'Пицца & Френч дог', kk: 'Пицца мен Френч дог' },
+            { id: 'snacks', icon: 'fa-drumstick-bite', ru: 'Крылышки & Наггетсы', kk: 'Қанаттар мен Наггетстер' },
+            { id: 'hot', icon: 'fa-bowl-food', ru: 'Горячее & Рамен', kk: 'Ыстық тағамдар & Рамен' },
+            { id: 'drinks', icon: 'fa-mug-hot', ru: 'Напитки & Кофе', kk: 'Сусындар мен Кофе' }
+        ];
+
+        const menuItems = [
+            // ДОНЕР
+            {
+                id: 'd1', category: 'doner',
+                name_ru: 'Донер классический', name_kk: 'Классикалық донер',
+                desc_ru: 'Сочное мясо, свежие овощи, фирменный соус', desc_kk: 'Шырынды ет, балғын көкөністер, фирмалық тұздық',
+                image: 'https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=600&q=80',
+                variants: [ { ru: 'Стандарт', kk: 'Стандарт', price: 1600 }, { ru: 'Мини', kk: 'Мини', price: 1000 } ]
+            },
+            {
+                id: 'd2', category: 'doner',
+                name_ru: 'Донер сырный', name_kk: 'Ирімшікті донер',
+                desc_ru: 'Донер со сливочным балғын сыром', desc_kk: 'Балғын ирімшігі бар дәмді донер',
+                image: 'https://images.unsplash.com/photo-1561651823-34feb02250e4?auto=format&fit=crop&w=600&q=80',
+                variants: [ { ru: 'Стандарт', kk: 'Стандарт', price: 1600 }, { ru: 'Мини', kk: 'Мини', price: 1000 } ]
+            },
+            {
+                id: 'd3', category: 'doner',
+                name_ru: 'Донер фирменный', name_kk: 'Фирмалық донер',
+                desc_ru: 'Особый авторский соус и свежая начинка', desc_kk: 'Арнайы авторлық тұздық пен балғын салма',
+                image: 'https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=600&q=80',
+                variants: [ { ru: 'Стандарт', kk: 'Стандарт', price: 1600 }, { ru: 'Мини', kk: 'Мини', price: 1000 } ]
+            },
+            {
+                id: 'd4', category: 'doner',
+                name_ru: 'Донер говяжий', name_kk: 'Сиыр етінен донер',
+                desc_ru: 'Отборное сочное говяжье мясо', desc_kk: 'Тандаулы шырынды сиыр еті',
+                image: 'https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=600&q=80',
+                variants: [ { ru: 'Стандарт', kk: 'Стандарт', price: 2000 }, { ru: 'Мини', kk: 'Мини', price: 1200 } ]
+            },
+            {
+                id: 'd5', category: 'doner',
+                name_ru: 'Донер жареный', name_kk: 'Қуырған донер',
+                desc_ru: 'Обжаренный на гриле до золотистой корочки', desc_kk: 'Грильде алтын түске дейін қуырған',
+                image: 'https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=600&q=80',
+                variants: [ { ru: 'Стандарт', kk: 'Стандарт', price: 1800 }, { ru: 'Мини', kk: 'Мини', price: 1200 } ]
+            },
+            {
+                id: 'd6', category: 'doner',
+                name_ru: 'Батон донер', name_kk: 'Батон донер',
+                desc_ru: 'Сытный донер в хрустящем батоне', desc_kk: 'Қытырлақ батонға салынған сапалы донер',
+                image: 'https://images.unsplash.com/photo-1509722747041-616f39b57569?auto=format&fit=crop&w=600&q=80',
+                variants: [ { ru: 'Стандарт', kk: 'Стандарт', price: 1900 }, { ru: 'Мини', kk: 'Мини', price: 900 } ]
+            },
+            {
+                id: 'd7', category: 'doner',
+                name_ru: 'Твистер', name_kk: 'Твистер', price: 1800,
+                desc_ru: 'Куриное филе и соус в тортилье', desc_kk: 'Тортильядағы тауық филесі мен тұздық',
+                image: 'https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=600&q=80'
+            },
+
+            // БУРГЕРЫ
+            {
+                id: 'b1', category: 'burger',
+                name_ru: 'Бургер говяжий', name_kk: 'Сиыр етінен бургер', price: 1800,
+                desc_ru: 'Сочная говяжья котлета, сыр и овощи', desc_kk: 'Сиыр еті котлетасы, ирімшік және көкөністер',
+                image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'b2', category: 'burger',
+                name_ru: 'Бургер со стрипсами', name_kk: 'Стрипсы қосылған бургер', price: 1600,
+                desc_ru: 'Хрустящие куриные стрипсы с соусом', desc_kk: 'Қытырлақ тауық стрипсылары мен тұздық',
+                image: 'https://images.unsplash.com/photo-1513185158878-8d8c2a2a3da3?auto=format&fit=crop&w=600&q=80'
+            },
+
+            // ПИЦЦА & ФРЕНЧ ДОГ
+            {
+                id: 'p1', category: 'pizza',
+                name_ru: 'Пицца Пепперони', name_kk: 'Пепперони пиццасы', price: 2500,
+                desc_ru: 'Пепперони, сыр моцарелла, соус', desc_kk: 'Пепперони шұжығы, моцарелла, тұздық',
+                image: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'p2', category: 'pizza',
+                name_ru: 'Пицца Куриный', name_kk: 'Тауық етімен пицца', price: 2500,
+                desc_ru: 'Нежное куриное филе и томаты', desc_kk: 'Нәзік тауық филесі мен қызанақ',
+                image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'p3', category: 'pizza',
+                name_ru: 'Пицца Маргарита', name_kk: 'Маргарита пиццасы', price: 2300,
+                desc_ru: 'Томатный соус и двойная моцарелла', desc_kk: 'Томат тұздығы мен қос моцарелла',
+                image: 'https://images.unsplash.com/photo-1604382355076-af4b0eb60143?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'p4', category: 'pizza',
+                name_ru: 'Пицца 4 сезона', name_kk: '4 жыл мезгілі пиццасы', price: 2800,
+                desc_ru: '4 разных вкуса в одной пицце', desc_kk: 'Бір пиццадағы 4 түрлі дәм',
+                image: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'p5', category: 'pizza',
+                name_ru: 'Френч дог', name_kk: 'Френч дог', price: 1400,
+                desc_ru: 'Французская булочка и сочная сосиска', desc_kk: 'Француз наны мен шырынды сосиска',
+                image: 'https://images.unsplash.com/photo-1619740455993-9e612b1af08a?auto=format&fit=crop&w=600&q=80'
+            },
+
+            // КРЫЛЫШКИ & НАГГЕТСЫ / ЗАКУСКИ
+            {
+                id: 's1', category: 'snacks',
+                name_ru: 'Острые куриные крылышки', name_kk: 'Ащы тауық қанаттары',
+                desc_ru: 'Хрустящие крылышки в пикантной панировке', desc_kk: 'Ащы дәмдеуіштер қосылған қытырлақ қанаттар',
+                image: 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?auto=format&fit=crop&w=600&q=80',
+                variants: [
+                    { ru: '10 шт', kk: '10 дана', price: 1950 },
+                    { ru: '20 шт', kk: '20 дана', price: 3950 },
+                    { ru: '30 шт', kk: '30 дана', price: 5950 },
+                    { ru: '40 шт', kk: '40 дана', price: 7950 }
+                ]
+            },
+            {
+                id: 's2', category: 'snacks',
+                name_ru: 'Наггетсы (10 шт)', name_kk: 'Наггетстер (10 дана)', price: 1800,
+                desc_ru: 'Куриные наггетсы обжаренные до корочки', desc_kk: 'Қуырылған тауық наггетстері',
+                image: 'https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 's3', category: 'snacks',
+                name_ru: 'Жареный судак (0.5 кг)', name_kk: 'Қуырған көксерке (0.5 кг)', price: 3500,
+                desc_ru: 'Свежий жареный судак с лимоном', desc_kk: 'Лимон қосылған қуырылған көксерке балығы',
+                image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 's4', category: 'snacks',
+                name_ru: 'Картофель фри', name_kk: 'Фри картобы', price: 800,
+                desc_ru: 'Золотистый хрустящий фри', desc_kk: 'Алтын түсті қытырлақ фри',
+                image: 'https://images.unsplash.com/photo-1576107232684-1279f3908594?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 's5', category: 'snacks',
+                name_ru: 'Фри с сосиской', name_kk: 'Сосиска қосылған фри', price: 1200,
+                desc_ru: 'Порция фри с нарезанной сосиской', desc_kk: 'Сосиска кесінділері бар фри порциясы',
+                image: 'https://images.unsplash.com/photo-1585109649139-366815a0d713?auto=format&fit=crop&w=600&q=80'
+            },
+
+            // ГОРЯЧЕЕ & ЗАВТРАКИ
+            {
+                id: 'h1', category: 'hot',
+                name_ru: 'Английский завтрак', name_kk: 'Ағылшын таңғы асы', price: 1800,
+                desc_ru: 'Яичница, колбаски, тосты и овощи', desc_kk: 'Жұмыртқа, сосискалар, тосттар мен көкөністер',
+                image: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'h2', category: 'hot',
+                name_ru: 'Том ям', name_kk: 'Том ям', price: 3900,
+                desc_ru: 'Острый тайский суп с креветками и рисом', desc_kk: 'Креветкалар мен күріш қосылған тай ащы сорпасы',
+                image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'h3', category: 'hot',
+                name_ru: 'Классический рамен', name_kk: 'Классикалық рамен', price: 1700,
+                desc_ru: 'Наваристый бульон, лапша и яйцо', desc_kk: 'Дәмді сорпа, кеспе және жұмыртқа',
+                image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'h4', category: 'hot',
+                name_ru: 'Сырный рамен', name_kk: 'Ирімшікті рамен', price: 2200,
+                desc_ru: 'Сливочно-сырный бульон и лапша', desc_kk: 'Сүтті-ирімшікті сорпа мен кеспе',
+                image: 'https://images.unsplash.com/photo-1591814468924-caf88d1232e1?auto=format&fit=crop&w=600&q=80'
+            },
+
+            // НАПИТКИ & КОФЕ
+            { id: 'dr1', category: 'drinks', name_ru: 'Кока Кола 1л', name_kk: 'Coca-Cola 1л', price: 850, desc_ru: 'Прохладительный напиток', desc_kk: 'Салқындатқыш сусын', image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=600&q=80' },
+            { id: 'dr2', category: 'drinks', name_ru: 'Кока Кола 0.5л', name_kk: 'Coca-Cola 0.5л', price: 600, desc_ru: 'Прохладительный напиток', desc_kk: 'Салқындатқыш сусын', image: 'https://images.unsplash.com/photo-1554866585-cd94860890b7?auto=format&fit=crop&w=600&q=80' },
+            { id: 'dr3', category: 'drinks', name_ru: 'Фанта 1л', name_kk: 'Фанта 1л', price: 850, desc_ru: 'Апельсиновый газированный напиток', desc_kk: 'Апельсин газдалған сусыны', image: 'https://images.unsplash.com/photo-1624517452488-04869289c4ca?auto=format&fit=crop&w=600&q=80' },
+            { id: 'dr4', category: 'drinks', name_ru: 'Спрайт 1л', name_kk: 'Спрайт 1л', price: 850, desc_ru: 'Лимонно-лаймовый напиток', desc_kk: 'Лимон-лайм сусыны', image: 'https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?auto=format&fit=crop&w=600&q=80' },
+            { id: 'dr5', category: 'drinks', name_ru: 'Пиала', name_kk: 'Пиала шайы', price: 850, desc_ru: 'Холодный чай', desc_kk: 'Салқын шай', image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=600&q=80' },
+            { id: 'dr6', category: 'drinks', name_ru: 'Фьюс ти', name_kk: 'Fuse Tea', price: 850, desc_ru: 'Холодный чай Fuse Tea', desc_kk: 'Fuse Tea салқын шайы', image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=600&q=80' },
+            { id: 'dr7', category: 'drinks', name_ru: 'Ава лимонад 1л', name_kk: 'Awa лимонад 1л', price: 850, desc_ru: 'Лимонад Ава 1л', desc_kk: 'Ава лимонады 1л', image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80' },
+            { id: 'dr8', category: 'drinks', name_ru: 'Ава апельсин', name_kk: 'Awa апельсин', price: 850, desc_ru: 'Апельсиновый напиток', desc_kk: 'Апельсин сусыны', image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=600&q=80' },
+            { id: 'dr9', category: 'drinks', name_ru: 'Молочный коктейль', name_kk: 'Сүт коктейлі', price: 1200, desc_ru: 'Густой молочный коктейль', desc_kk: 'Қою сүт коктейлі', image: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=600&q=80' },
+            { id: 'dr10', category: 'drinks', name_ru: 'Клубничный коктейль', name_kk: 'Құлпынай коктейлі', price: 1200, desc_ru: 'Клубничный молочный коктейль', desc_kk: 'Құлпынай сүт коктейлі', image: 'https://images.unsplash.com/photo-1579954115545-a95591f28bfc?auto=format&fit=crop&w=600&q=80' },
+            { id: 'dr11', category: 'drinks', name_ru: 'Кофе капучино', name_kk: 'Капучино кофесі', price: 1000, desc_ru: 'Эспрессо с пышной пенкой', desc_kk: 'Пепігі бар капучино', image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?auto=format&fit=crop&w=600&q=80' },
+            { id: 'dr12', category: 'drinks', name_ru: 'Кофе латте', name_kk: 'Латте кофесі', price: 1000, desc_ru: 'Классический латте с молоком', desc_kk: 'Сүт қосылған классикалық латте', image: 'https://images.unsplash.com/photo-1534778101976-62847782c213?auto=format&fit=crop&w=600&q=80' },
+            { id: 'dr13', category: 'drinks', name_ru: 'Айс латте', name_kk: 'Айс латте', price: 1200, desc_ru: 'Холодный кофе с молоком', desc_kk: 'Сүт пен мұз қосылған салқын кофе', image: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=600&q=80' },
+            { id: 'dr14', category: 'drinks', name_ru: 'Чай 3в1', name_kk: 'Шай 3в1', price: 300, desc_ru: 'Горячий сладкий чай', desc_kk: 'Ыстық тәтті шай', image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=600&q=80' },
+            { id: 'dr15', category: 'drinks', name_ru: 'Кофе 3в1', name_kk: 'Кофе 3в1', price: 300, desc_ru: 'Растворимый кофе 3в1', desc_kk: '3в1 кофе сусыны', image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=600&q=80' }
+        ];
+
+        let activeCategory = 'all';
+        let searchQuery = '';
+        let cart = [];
+        const selectedVariants = {};
+
+        window.onload = function() {
+            updateLanguageUI();
+            renderCategoryTabs();
+            renderMenu();
+        };
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.getElementById('lang-ru').className = lang === 'ru' 
+                ? 'px-2.5 py-1 text-xs font-bold rounded-lg transition-all bg-amber-500 text-black' 
+                : 'px-2.5 py-1 text-xs font-bold rounded-lg transition-all text-zinc-400 hover:text-white';
+            
+            document.getElementById('lang-kk').className = lang === 'kk' 
+                ? 'px-2.5 py-1 text-xs font-bold rounded-lg transition-all bg-amber-500 text-black' 
+                : 'px-2.5 py-1 text-xs font-bold rounded-lg transition-all text-zinc-400 hover:text-white';
+
+            updateLanguageUI();
+            renderCategoryTabs();
+            renderMenu();
+            updateCartUI();
+        }
+
+        function updateLanguageUI() {
+            const t = i18n[currentLang];
+            document.getElementById('searchInput').placeholder = t.searchPlaceholder;
+            document.getElementById('txt-delivery-badge').innerText = t.deliveryBadge;
+            document.getElementById('txt-address').innerText = t.address;
+            document.getElementById('txt-promo-badge').innerText = t.promoBadge;
+            document.getElementById('txt-banner-title').innerText = t.bannerTitle;
+            document.getElementById('txt-banner-desc').innerText = t.bannerDesc;
+            document.getElementById('txt-empty-title').innerText = t.emptyTitle;
+            document.getElementById('txt-empty-desc').innerText = t.emptyDesc;
+            document.getElementById('txt-cart-btn').innerText = t.cartBtn;
+            document.getElementById('txt-cart-title').innerText = t.cartTitle;
+            document.getElementById('txt-details-label').innerText = t.detailsLabel;
+            document.getElementById('customerName').placeholder = t.namePlaceholder;
+            document.getElementById('customerAddress').placeholder = t.addrPlaceholder;
+            document.getElementById('customerNote').placeholder = t.notePlaceholder;
+            document.getElementById('txt-total-label').innerText = t.totalLabel;
+            document.getElementById('txt-submit-btn').innerText = t.submitBtn;
+        }
+
+        function renderCategoryTabs() {
+            const categoryTabs = document.getElementById('categoryTabs');
+            categoryTabs.innerHTML = categories.map(cat => `
+                <button onclick="setCategory('${cat.id}')" 
+                    class="px-4 py-2 rounded-xl whitespace-nowrap transition-all duration-200 flex items-center gap-2 font-semibold text-xs sm:text-sm ${
+                        activeCategory === cat.id 
+                        ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/20' 
+                        : 'bg-zinc-800/80 text-zinc-300 hover:bg-zinc-700'
+                    }">
+                    <i class="fa-solid ${cat.icon}"></i>
+                    <span>${cat[currentLang]}</span>
+                </button>
+            `).join('');
+        }
+
+        function setCategory(catId) {
+            activeCategory = catId;
+            renderCategoryTabs();
+            renderMenu();
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchQuery = e.target.value.toLowerCase().trim();
+            document.getElementById('clearSearch').classList.toggle('hidden', searchQuery.length === 0);
+            renderMenu();
+        });
+
+        document.getElementById('clearSearch').addEventListener('click', () => {
+            document.getElementById('searchInput').value = '';
+            searchQuery = '';
+            document.getElementById('clearSearch').classList.add('hidden');
+            renderMenu();
+        });
+
+        function renderMenu() {
+            const menuContainer = document.getElementById('menuContainer');
+            const emptySearch = document.getElementById('emptySearch');
+            menuContainer.innerHTML = '';
+
+            let visibleCategories = activeCategory === 'all' 
+                ? categories.filter(c => c.id !== 'all') 
+                : categories.filter(c => c.id === activeCategory);
+
+            let totalMatches = 0;
+
+            visibleCategories.forEach(cat => {
+                let items = menuItems.filter(item => {
+                    const matchesCategory = item.category === cat.id;
+                    const name = item[`name_${currentLang}`].toLowerCase();
+                    const desc = item[`desc_${currentLang}`].toLowerCase();
+                    return matchesCategory && (name.includes(searchQuery) || desc.includes(searchQuery));
+                });
+
+                if (items.length > 0) {
+                    totalMatches += items.length;
+
+                    const catHeader = document.createElement('div');
+                    catHeader.className = 'space-y-4';
+                    catHeader.innerHTML = `
+                        <div class="flex items-center gap-2 border-b border-zinc-800 pb-2">
+                            <i class="fa-solid ${cat.icon} text-amber-400 text-lg"></i>
+                            <h3 class="text-xl font-bold text-white tracking-wide">${cat[currentLang]}</h3>
+                            <span class="text-xs bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-full font-medium ml-auto">${items.length}</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            ${items.map(item => createCardHTML(item)).join('')}
+                        </div>
+                    `;
+                    menuContainer.appendChild(catHeader);
+                }
+            });
+
+            emptySearch.classList.toggle('hidden', totalMatches > 0);
+        }
+
+        function createCardHTML(item) {
+            const t = i18n[currentLang];
+            const name = item[`name_${currentLang}`];
+            const desc = item[`desc_${currentLang}`];
+            const hasVariants = item.variants && item.variants.length > 0;
+            const defaultPrice = hasVariants ? item.variants[0].price : item.price;
+
+            return `
+                <div class="bg-zinc-900/90 border border-zinc-800/80 rounded-2xl overflow-hidden shadow-lg hover:border-amber-500/40 transition-all duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="relative h-40 overflow-hidden bg-zinc-800">
+                            <img src="${item.image}" alt="${name}" loading="lazy"
+                                onerror="this.src='https://placehold.co/600x400/2a2a2a/ff9f1c?text=${encodeURIComponent(name)}'"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent"></div>
+                        </div>
+
+                        <div class="p-4 space-y-2">
+                            <h4 class="font-bold text-base text-zinc-100 group-hover:text-amber-400 transition-colors">${name}</h4>
+                            <p class="text-xs text-zinc-400 leading-relaxed line-clamp-2">${desc}</p>
+                            
+                            ${hasVariants ? `
+                                <div class="pt-2">
+                                    <label class="text-[10px] text-zinc-400 uppercase font-semibold block mb-1.5">${t.variantSelect}</label>
+                                    <div class="grid grid-cols-2 gap-1.5">
+                                        ${item.variants.map((v, idx) => `
+                                            <button onclick="selectVariant('${item.id}', ${idx})" 
+                                                class="variant-btn-${item.id} py-1.5 px-2 rounded-lg text-xs font-semibold border text-center transition-all ${
+                                                    idx === 0 
+                                                    ? 'bg-amber-500/20 border-amber-500 text-amber-400' 
+                                                    : 'bg-zinc-800 border-zinc-700 text-zinc-400 hover:border-zinc-600'
+                                                }">
+                                                ${v[currentLang]} - ${v.price} тг
+                                            </button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    <div class="p-4 pt-0 flex items-center justify-between gap-3 mt-2">
+                        <div>
+                            <span class="text-[10px] text-zinc-500 block uppercase font-medium">${t.priceLabel}</span>
+                            <span id="price-${item.id}" class="text-lg font-extrabold text-amber-400">${defaultPrice} тг</span>
+                        </div>
+                        <button onclick="addToCart('${item.id}')" 
+                            class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-md flex items-center gap-1.5 transition active:scale-95">
+                            <i class="fa-solid fa-plus text-xs"></i>
+                            <span>${t.addBtn}</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectVariant(itemId, variantIndex) {
+            const item = menuItems.find(i => i.id === itemId);
+            if (!item || !item.variants) return;
+
+            const buttons = document.querySelectorAll(`.variant-btn-${itemId}`);
+            buttons.forEach((btn, idx) => {
+                btn.className = idx === variantIndex
+                    ? `variant-btn-${itemId} py-1.5 px-2 rounded-lg text-xs font-semibold border text-center transition-all bg-amber-500/20 border-amber-500 text-amber-400`
+                    : `variant-btn-${itemId} py-1.5 px-2 rounded-lg text-xs font-semibold border text-center transition-all bg-zinc-800 border-zinc-700 text-zinc-400 hover:border-zinc-600`;
+            });
+
+            selectedVariants[itemId] = item.variants[variantIndex];
+            document.getElementById(`price-${itemId}`).innerText = `${item.variants[variantIndex].price} тг`;
+        }
+
+        function addToCart(itemId) {
+            const item = menuItems.find(i => i.id === itemId);
+            if (!item) return;
+
+            let name = item[`name_${currentLang}`];
+            let price = item.price;
+
+            if (item.variants && item.variants.length > 0) {
+                const selected = selectedVariants[itemId] || item.variants[0];
+                name = `${item[`name_${currentLang}`]} (${selected[currentLang]})`;
+                price = selected.price;
+            }
+
+            const cartKey = `${itemId}-${name}`;
+            const existingIndex = cart.findIndex(c => c.cartKey === cartKey);
+
+            if (existingIndex > -1) {
+                cart[existingIndex].quantity += 1;
+            } else {
+                cart.push({ cartKey, id: item.id, name, price, quantity: 1, image: item.image });
+            }
+
+            updateCartUI();
+            showToast(i18n[currentLang].addedToast + name);
+        }
+
+        function updateCartUI() {
+            const totalCount = cart.reduce((s, i) => s + i.quantity, 0);
+            const totalPrice = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+
+            document.getElementById('cartBadge').innerText = totalCount;
+            document.getElementById('cartTotalPrice').innerText = `${totalPrice} тг`;
+            document.getElementById('cartModalTotal').innerText = `${totalPrice} тг`;
+
+            document.getElementById('floatingCartBtn').classList.toggle('hidden', totalCount === 0);
+            if (totalCount === 0) toggleCartModal(false);
+
+            renderCartModalItems();
+        }
+
+        function renderCartModalItems() {
+            const cartItemsList = document.getElementById('cartItemsList');
+            if (cart.length === 0) {
+                cartItemsList.innerHTML = `
+                    <div class="text-center py-12 text-zinc-500 space-y-2">
+                        <i class="fa-solid fa-cart-flatbed text-3xl"></i>
+                        <p class="text-sm">${i18n[currentLang].cartEmpty}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            cartItemsList.innerHTML = cart.map((item, idx) => `
+                <div class="flex items-center justify-between bg-zinc-800/60 p-3 rounded-xl border border-zinc-800 gap-3">
+                    <img src="${item.image}" class="w-12 h-12 rounded-lg object-cover bg-zinc-700" alt="${item.name}">
+                    <div class="flex-1 min-w-0">
+                        <h5 class="text-xs font-bold text-white truncate">${item.name}</h5>
+                        <span class="text-xs text-amber-400 font-bold">${item.price} тг</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-zinc-900 px-2 py-1 rounded-lg border border-zinc-700">
+                        <button onclick="changeQty(${idx}, -1)" class="text-zinc-400 hover:text-white px-1"><i class="fa-solid fa-minus text-xs"></i></button>
+                        <span class="text-xs font-bold text-white w-4 text-center">${item.quantity}</span>
+                        <button onclick="changeQty(${idx}, 1)" class="text-zinc-400 hover:text-white px-1"><i class="fa-solid fa-plus text-xs"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function changeQty(index, delta) {
+            if (cart[index]) {
+                cart[index].quantity += delta;
+                if (cart[index].quantity <= 0) cart.splice(index, 1);
+                updateCartUI();
+            }
+        }
+
+        function toggleCartModal(show) {
+            const cartModal = document.getElementById('cartModal');
+            cartModal.classList.toggle('hidden', !show);
+            document.body.style.overflow = show ? 'hidden' : 'auto';
+        }
+
+        function sendOrderWhatsApp() {
+            if (cart.length === 0) return;
+
+            const name = document.getElementById('customerName').value.trim() || 'Не указано';
+            const address = document.getElementById('customerAddress').value.trim() || 'Не указан';
+            const note = document.getElementById('customerNote').value.trim();
+
+            let message = `*🔥 ЗАКАЗ — Uide Fast Food*\n\n`;
+            message += `👤 *Имя / Аты:* ${name}\n`;
+            message += `📍 *Адрес / Мекенжай:* ${address}\n`;
+            if (note) message += `📝 *Комментарий:* ${note}\n`;
+            message += `\n*🛒 Заказ / Тапсырыс:*\n`;
+
+            let totalPrice = 0;
+            cart.forEach((item, i) => {
+                const itemTotal = item.price * item.quantity;
+                totalPrice += itemTotal;
+                message += `${i + 1}. ${item.name} — ${item.quantity} шт. x ${item.price} тг = *${itemTotal} тг*\n`;
+            });
+
+            message += `\n💰 *Итого / Барлығы:* *${totalPrice} тг*`;
+
+            const whatsappUrl = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        let toastTimeout;
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.remove('translate-y-[-100px]', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-[-100px]', 'opacity-0');
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
